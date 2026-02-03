@@ -25,7 +25,7 @@ export function createGame(): GameState {
 
 export const changePlayer = (player: Player): Player => {
   if (player === "X") return "O"
-  if (player === "O") return "X"
+  else return "X"
 }
 
 export function makeMove(state: GameState, position: number): GameState {
