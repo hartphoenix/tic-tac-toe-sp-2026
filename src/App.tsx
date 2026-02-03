@@ -5,13 +5,14 @@ import { Board } from "./Board";
 function App() {
   const [gameState, setGameState] = useState(getInitialGame())
 
+  // arbitrary change
   // TODO: display the gameState, and call `makeMove` when a player clicks a button
   return (
     <>
       <div>Hello World! current player: {gameState.currentPlayer}</div>
       <Board gameState={gameState} setGameState={setGameState} />
     </>
-    
+
   )
 }
 
