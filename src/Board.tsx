@@ -13,6 +13,7 @@ export const Board = (props: BoardProps) => {
   }
   const buttons: JSX.Element[] = props.gameState.board.map((pos: Cell, ind: number) => (
     <button
+      className="move-btn"
       disabled={pos !== null || getWinner(props.gameState) !== null ? true : false}
       onClick={() => handleClick(ind)}>{props.gameState.board[ind]
         ? props.gameState.board[ind]

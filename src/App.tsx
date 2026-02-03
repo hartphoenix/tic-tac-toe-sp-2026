@@ -9,7 +9,6 @@ function App() {
   return (
     <>
       <Header gameState={gameState} reset={reset} />
-      <div>Current player: {gameState.currentPlayer}</div>
       <Board gameState={gameState} setGameState={setGameState} />
     </>
 

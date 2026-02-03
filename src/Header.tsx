@@ -9,15 +9,24 @@ export const Header = (
     }
 ): JSX.Element => {
     if (getWinner(gameState) !== null) return (
-        <>
+        <div className="header">
             <p>{getWinner(gameState)} wins!</p>
-            <button
-                onClick={reset}>
+            <button className="reset-btn" onClick={reset}>
                 Play again?
             </button>
-        </>
+        </div>
+    )
+    if (!gameState.board.some(pos => pos === null)) return (
+        <div className="header">
+            <p>Tie game!</p>
+            <button className="reset-btn" onClick={reset}>
+                Play again?
+            </button>
+        </div>
     )
     else return (
-        <p>{gameState.currentPlayer}'s move:</p>
+        <div className="header">
+            <p>{gameState.currentPlayer}'s move</p>
+        </div>
     )
 }
