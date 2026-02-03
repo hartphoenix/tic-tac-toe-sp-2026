@@ -1,94 +1,41 @@
 
-import { makeMove } from "./tic-tac-toe"
-import type { GameState } from "./tic-tac-toe"
+import { makeMove, getWinner } from "./tic-tac-toe"
+import type { GameState, Cell } from "./tic-tac-toe"
+import type { JSX } from "react"
 type BoardProps = {
   gameState: GameState
   setGameState: (state: GameState) => void
 }
 export const Board = (props: BoardProps) => {
+
   const handleClick = (position: number): void => {
     props.setGameState(makeMove(props.gameState, position))
   }
+  const buttons: JSX.Element[] = props.gameState.board.map((pos: Cell, ind: number) => (
+    <button
+      disabled={pos !== null || getWinner(props.gameState) !== null ? true : false}
+      onClick={() => handleClick(ind)}>{props.gameState.board[ind]
+        ? props.gameState.board[ind]
+        : "_"
+      }</button>
+  ))
   return (
     <table>
       <tbody>
         <tr>
-          <td>
-            <button
-              disabled={props.gameState.board[0] ? true : false}
-              onClick={() => handleClick(0)}>{props.gameState.board[0]
-                ? props.gameState.board[0]
-                : "_"
-              }</button>
-          </td>
-          <td>
-            <button
-              disabled={props.gameState.board[1] ? true : false}
-              onClick={() => handleClick(1)}>{props.gameState.board[1]
-                ? props.gameState.board[1]
-                : "_"
-              }</button>
-          </td>
-          <td>
-            <button
-              disabled={props.gameState.board[2] ? true : false}
-              onClick={() => handleClick(2)}>{props.gameState.board[2]
-                ? props.gameState.board[2]
-                : "_"
-              }</button>
-          </td>
+          <td>{buttons[0]}</td>
+          <td>{buttons[1]}</td>
+          <td>{buttons[2]}</td>
         </tr>
         <tr>
-          <td>
-            <button
-              disabled={props.gameState.board[3] ? true : false}
-              onClick={() => handleClick(3)}>{props.gameState.board[3]
-                ? props.gameState.board[3]
-                : "_"
-              }</button>
-          </td>
-          <td>
-            <button
-              disabled={props.gameState.board[4] ? true : false}
-              onClick={() => handleClick(4)}>{props.gameState.board[4]
-                ? props.gameState.board[4]
-                : "_"
-              }</button>
-          </td>
-          <td>
-            <button
-              disabled={props.gameState.board[5] ? true : false}
-              onClick={() => handleClick(5)}>{props.gameState.board[5]
-                ? props.gameState.board[5]
-                : "_"
-              }</button>
-          </td>
+          <td>{buttons[3]}</td>
+          <td>{buttons[4]}</td>
+          <td>{buttons[5]}</td>
         </tr>
         <tr>
-          <td>
-            <button
-              disabled={props.gameState.board[6] ? true : false}
-              onClick={() => handleClick(6)}>{props.gameState.board[6]
-                ? props.gameState.board[6]
-                : "_"
-              }</button>
-          </td>
-          <td>
-            <button
-              disabled={props.gameState.board[7] ? true : false}
-              onClick={() => handleClick(7)}>{props.gameState.board[7]
-                ? props.gameState.board[7]
-                : "_"
-              }</button>
-          </td>
-          <td>
-            <button
-              disabled={props.gameState.board[8] ? true : false}
-              onClick={() => handleClick(8)}>{props.gameState.board[8]
-                ? props.gameState.board[8]
-                : "_"
-              }</button>
-          </td>
+          <td>{buttons[6]}</td>
+          <td>{buttons[7]}</td>
+          <td>{buttons[8]}</td>
         </tr>
       </tbody>
     </table>

@@ -29,6 +29,19 @@ export const changePlayer = (player: Player): Player => {
 }
 
 export function makeMove(state: GameState, position: number): GameState {
+  if (position < 0 || position > 8) {
+    throw new Error("Position must be between 0 and 8")
+  }
+  if (position % 1 !== 0) {
+    throw new Error("Position must be an integer")
+  }
+  if (state.board[position] !== null) {
+    throw new Error("Position is already occupied")
+  }
+  if (getWinner(state) !== null) {
+    throw new Error("Game is already over")
+  }
+
   const newBoard: Board = [...state.board]
   newBoard[position] = state.currentPlayer
   const winner = getWinner({ board: newBoard, currentPlayer: state.currentPlayer })
@@ -40,15 +53,20 @@ export function makeMove(state: GameState, position: number): GameState {
   return newState
 }
 
+const tripleWins = (state: GameState, n: number[]): boolean => {
+  if (state.board[n[0]] && state.board[n[0]] === state.board[n[1]] && state.board[n[1]] === state.board[n[2]]) {
+    return true
+  } else return false
+}
+
 export function getWinner(state: GameState): Player | null {
-  if ((state.board[0] && state.board[0] === state.board[1] && state.board[1] === state.board[2]) // horizontal
-    || (state.board[3] && state.board[3] === state.board[4] && state.board[4] === state.board[5]) // horizontal
-    || (state.board[6] && state.board[6] === state.board[7] && state.board[7] === state.board[8]) // horizontal
-    || (state.board[0] && state.board[0] === state.board[4] && state.board[4] === state.board[8]) // diagonal
-    || (state.board[2] && state.board[2] === state.board[4] && state.board[4] === state.board[6]) // diagonal
-    || (state.board[0] && state.board[0] === state.board[3] && state.board[3] === state.board[6]) // vertical
-    || (state.board[1] && state.board[1] === state.board[4] && state.board[4] === state.board[7]) // vertical
-    || (state.board[2] && state.board[2] === state.board[5] && state.board[5] === state.board[8]) // vertical
-  ) { return state.currentPlayer }
+  const winLines: Array<Array<number>> = [
+    [0, 1, 2], [3, 4, 5], [6, 7, 8], // horizontals
+    [0, 3, 6], [1, 4, 7], [2, 5, 8], // verticals
+    [0, 4, 8], [2, 4, 6] //          diagonals
+  ]
+  for (const line of winLines) {
+    if (tripleWins(state, line)) return state.board[line[0]]
+  }
   return null;
 }

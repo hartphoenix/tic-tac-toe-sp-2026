@@ -1,24 +1,19 @@
 import { useState } from "react";
-import { createGame, makeMove } from "./tic-tac-toe";
+import { createGame } from "./tic-tac-toe";
 import { Board } from "./Board";
+import { Header } from "./Header";
 
 function App() {
-  const [gameState, setGameState] = useState(getInitialGame())
-
+  const [gameState, setGameState] = useState(createGame())
+  const reset = (): void => setGameState(createGame())
   return (
     <>
+      <Header gameState={gameState} reset={reset} />
       <div>Current player: {gameState.currentPlayer}</div>
       <Board gameState={gameState} setGameState={setGameState} />
     </>
 
   )
-}
-
-function getInitialGame() {
-  let initialGameState = createGame()
-  initialGameState = makeMove(initialGameState, 3)
-  initialGameState = makeMove(initialGameState, 0)
-  return initialGameState
 }
 
 export default App;
