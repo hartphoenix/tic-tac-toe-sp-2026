@@ -23,8 +23,17 @@ export function createGame(): GameState {
   };
 }
 
+export const changePlayer = (player: Player):Player => {
+  if (player === "X") return "O"
+  if (player === "O") return "X"
+}
+
 export function makeMove(state: GameState, position: number): GameState {
-  return state
+  const newBoard:Cell[] = [...state.board]
+  newBoard[position] = state.currentPlayer
+  const newPlayer = changePlayer(state.currentPlayer)
+  const newState:GameState = { board: newBoard, currentPlayer: newPlayer} 
+  return newState
 }
 
 export function getWinner(state: GameState): Player | null {
