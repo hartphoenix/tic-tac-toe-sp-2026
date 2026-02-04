@@ -9,12 +9,12 @@ export type Board = [
   Cell, Cell, Cell, Cell, Cell, Cell, Cell, Cell, Cell,
 ];
 
-type WinState = Player | 'tie' | undefined
+type WinState = Player | 'tie' | null
 
 export type GameState = {
   board: Board;
   currentPlayer: Player;
-  endState?: WinState
+  endState: WinState
 };
 
 export function createGame(): GameState {
@@ -25,6 +25,7 @@ export function createGame(): GameState {
       null, null, null, null, null, null, null, null, null
     ],
     currentPlayer: "X",
+    endState: null
   };
 }
 
@@ -43,18 +44,15 @@ export function makeMove(state: GameState, position: number): GameState {
   if (state.board[position] !== null) {
     throw new Error("Position is already occupied")
   }
-  if (getWinner(state) !== null) {
+  if (state.endState !== null) {
     throw new Error("Game is already over")
   }
 
   const newBoard: Board = [...state.board]
   newBoard[position] = state.currentPlayer
-  const winner = getWinner({ board: newBoard, currentPlayer: state.currentPlayer })
-  if (winner) {
-    console.log("WINNER:", winner)
-  }
   const newPlayer = changePlayer(state.currentPlayer)
-  const newState: GameState = { board: newBoard, currentPlayer: newPlayer, endState: winner ?? undefined }
+  const winner = getWinner({ board: newBoard, currentPlayer: state.currentPlayer, endState: state.endState })
+  const newState: GameState = { board: newBoard, currentPlayer: newPlayer, endState: winner }
   return newState
 }
 
