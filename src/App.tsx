@@ -1,17 +1,46 @@
-import { useState } from "react";
-import { createGame, makeMove, getWinner } from "./tic-tac-toe";
+import { useState, useEffect } from "react";
+import type { GameState, Player } from "./tic-tac-toe"
+import { createGame } from "./tic-tac-toe";
 // import { Board } from "./Board";
 import { Header } from "./Header";
 import { Board3D } from "./Board3D";
 
 function App() {
   const [gameState, setGameState] = useState(createGame())
-  const reset = (): void => setGameState(createGame())
+  const reset = async (): Promise<void> => {
+    const response = await fetch('/api/reset')
+    const newGame = await response.json()
+    setGameState(newGame)
+  }
 
-  const handleCellClick = (index: number) => {
+  useEffect(() => {
+    const fetchGame = async () => {
+      const response = await fetch('/api/game')
+      const initialState = await response.json()
+      setGameState(initialState)
+    }
+    fetchGame()
+  }, [])
+
+  const sendMove = async (move: { player: Player, position: number }): Promise<GameState> => {
+    const response = await fetch('/api/move', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(move)
+    })
+    const updatedState = await response.json()
+    return updatedState
+  }
+
+  const handleCellClick = async (index: number) => {
     // Ignore clicks on occupied cells or if game is over
-    if (gameState.board[index] !== null || getWinner(gameState) !== null) return
-    setGameState(makeMove(gameState, index))
+    if (gameState.board[index] !== null || gameState.endState !== null) return
+    try {
+      const newState = await sendMove({ player: gameState.currentPlayer, position: index })
+      setGameState(newState)
+    } catch (err) {
+      console.error('Move failed:', err)
+    }
   }
 
   return (
