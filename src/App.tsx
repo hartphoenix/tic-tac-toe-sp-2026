@@ -8,14 +8,14 @@ import { Board3D } from "./Board3D";
 function App() {
   const [gameState, setGameState] = useState(createGame())
   const reset = async (): Promise<void> => {
-    const response = await fetch('/api/reset')
+    const response = await fetch('/api/create')
     const newGame = await response.json()
     setGameState(newGame)
   }
 
   useEffect(() => {
     const fetchGame = async () => {
-      const response = await fetch('/api/game')
+      const response = await fetch('/api/create')
       const initialState = await response.json()
       setGameState(initialState)
     }
@@ -23,7 +23,7 @@ function App() {
   }, [])
 
   const sendMove = async (move: { player: Player, position: number }): Promise<GameState> => {
-    const response = await fetch('/api/move', {
+    const response = await fetch(`/api/move/${gameState.id}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(move)
