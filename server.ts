@@ -2,7 +2,7 @@ import type { Express, Request, Response } from 'express';
 import express from 'express';
 import ViteExpress from 'vite-express';
 import { createGame, makeMove } from './src/tic-tac-toe'
-import type { Player, Cell, Board, WinState, GameState } from './src/tic-tac-toe'
+import type { Player, GameState } from './src/tic-tac-toe'
 
 const app: Express = express();
 app.use(express.json());

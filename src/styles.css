@@ -3,7 +3,7 @@
 html {
     margin: 0;
     padding: 0;
-    font-family: "Cormorant Garamond", "Times New Roman", serif;
+    font-family: "Bungee Hairline", sans-serif;
     font-weight: 600;
     font-style: normal;
     background-color: #0d0d0d;
@@ -35,16 +35,16 @@ body {
     justify-content: space-around;
     align-items: center;
     text-align: center;
-    min-height: 100px;
-    padding: 20px 0;
-    font-size: 28px;
-    letter-spacing: 4px;
+    min-height: clamp(60px, 12vh, 100px);
+    padding: clamp(10px, 2vh, 20px) 0;
+    font-size: clamp(24px, 5vw, 50px);
+    letter-spacing: clamp(2px, 0.4vw, 4px);
     text-transform: uppercase;
     background: transparent;
     pointer-events: none;
 }
 
-.header > * {
+.header>* {
     pointer-events: auto;
 }
 
@@ -61,7 +61,7 @@ body {
 .move-btn {
     width: 90px;
     height: 90px;
-    font-family: "Cormorant Garamond", "Times New Roman", serif;
+    font-family: "Bungee Hairline", sans-serif;
     font-weight: 700;
     font-style: normal;
     font-size: 48px;
@@ -83,7 +83,7 @@ body {
 .move-btn:disabled {
     width: 90px;
     height: 90px;
-    font-family: "Cormorant Garamond", "Times New Roman", serif;
+    font-family: "Bungee Hairline", sans-serif;
     font-weight: 700;
     font-style: normal;
     font-size: 48px;
@@ -96,16 +96,16 @@ body {
 }
 
 .reset-btn {
-    width: 70%;
-    height: 44px;
+    width: clamp(200px, 50vw, 400px);
+    height: clamp(32px, 5vh, 44px);
     margin: auto;
-    margin-bottom: 6px;
-    margin-top: -23px;
-    font-family: "Cormorant Garamond", "Times New Roman", serif;
-    font-weight: 600;
+    margin-bottom: clamp(4px, 1vh, 6px);
+    margin-top: clamp(-16px, -2vh, -23px);
+    font-family: "Bungee Hairline", sans-serif;
+    font-weight: 800;
     font-style: normal;
-    font-size: 18px;
-    letter-spacing: 3px;
+    font-size: clamp(16px, 2.5vw, 28px);
+    letter-spacing: clamp(1px, 0.3vw, 3px);
     text-transform: uppercase;
     color: #c9a227;
     background-color: transparent;

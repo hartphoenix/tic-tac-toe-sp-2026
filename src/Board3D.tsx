@@ -1,9 +1,12 @@
 import { useState, useEffect, useRef } from "react"
-import { Canvas } from "@react-three/fiber"
+import { Canvas, useThree } from "@react-three/fiber"
 import { OrbitControls } from "@react-three/drei"
+import { useSpring, animated } from "@react-spring/three"
+import type { PerspectiveCamera } from "three"
 import type { Cell } from "./tic-tac-toe"
 
 const BOX_SIZE = 0.9
+const BASE_CAMERA_DISTANCE = 3.2
 const MIN_SPREAD = 0.95  // 5% gap between boxes (nearly touching)
 const MAX_SPREAD = 1.8   // 1 box-width gap between boxes
 const DRAG_THRESHOLD = 5 // pixels of movement to count as drag
@@ -34,6 +37,13 @@ function Cell3D({ position, value, onClick }: CellProps) {
     return hovered ? COLORS.emptyHover : COLORS.empty
   }
 
+  // Animate color and opacity changes over 300ms
+  const springs = useSpring({
+    color: getColor(),
+    opacity: value ? 0.85 : hovered ? 0.6 : 0.2,
+    config: { duration: 300 }
+  })
+
   const handlePointerDown = (e: { stopPropagation: () => void; clientX: number; clientY: number }) => {
     e.stopPropagation()
     pointerStart.current = { x: e.clientX, y: e.clientY }
@@ -63,14 +73,30 @@ function Cell3D({ position, value, onClick }: CellProps) {
         onPointerOut={(e) => { e.stopPropagation(); setHovered(false) }}
       >
         <boxGeometry args={[BOX_SIZE, BOX_SIZE, BOX_SIZE]} />
-        <meshStandardMaterial
-          color={getColor()}
+        <animated.meshStandardMaterial
+          color={springs.color}
           transparent
-          opacity={value ? 0.85 : hovered ? 0.6 : 0.2}
+          opacity={springs.opacity}
         />
       </mesh>
     </group>
   )
+}
+
+// Adjusts camera FOV based on viewport aspect ratio (preserves OrbitControls rotation)
+function CameraController() {
+  const { camera, size } = useThree()
+
+  useEffect(() => {
+    const aspect = size.width / size.height
+    // In portrait mode (aspect < 1), widen FOV to keep cube visible
+    const cam = camera as PerspectiveCamera
+    // eslint-disable-next-line react-hooks/immutability
+    cam.fov = aspect < 1 ? 50 / aspect : 50
+    cam.updateProjectionMatrix()
+  }, [camera, size])
+
+  return null
 }
 
 // Props interface - ready for game state integration
@@ -117,9 +143,10 @@ export function Board3D({ board, onCellClick }: Board3DProps) {
   return (
     <div
       ref={containerRef}
-      style={{ width: "100%", height: "1000px" }}
+      style={{ width: "100%", height: "100vh" }}
     >
-      <Canvas camera={{ position: [5.2, 5.2, 5.2], fov: 50 }}>
+      <Canvas camera={{ position: [BASE_CAMERA_DISTANCE, BASE_CAMERA_DISTANCE, BASE_CAMERA_DISTANCE], fov: 50 }}>
+        <CameraController />
         {/* Lighting */}
         <ambientLight intensity={0.6} />
         <directionalLight position={[5, 5, 5]} intensity={1} />
