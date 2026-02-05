@@ -38,4 +38,5 @@ app.post('/api/move', (req: Request, res: Response): void => {
     }
 })
 
-ViteExpress.listen(app, 3000, () => console.log('Server is listening...'));
+ViteExpress.listen(app, 3000, () => console.log('Server is listening...'))
+export default app
