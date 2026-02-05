@@ -6,7 +6,7 @@ import type { PerspectiveCamera } from "three"
 import type { Cell } from "./tic-tac-toe"
 
 const BOX_SIZE = 0.9
-const BASE_CAMERA_DISTANCE = 3.2
+const BASE_CAMERA_DISTANCE = 4.2
 const MIN_SPREAD = 0.95  // 5% gap between boxes (nearly touching)
 const MAX_SPREAD = 1.8   // 1 box-width gap between boxes
 const DRAG_THRESHOLD = 5 // pixels of movement to count as drag
