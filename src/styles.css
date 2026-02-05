@@ -58,18 +58,19 @@ body {
     box-shadow: 0 0 40px rgba(201, 162, 39, 0.15);
 }
 
-.move-btn {
-    width: 90px;
-    height: 90px;
+.lobby-btn {
+    position: absolute;
+    z-index: 10;
+    margin: clamp(20px, 10vw, 50px) clamp(10px, 10vw, 50px);
+    display: flex;
     font-family: "Audiowide", sans-serif;
     font-weight: 200;
     font-style: normal;
-    font-size: 48px;
-    padding: 0;
+    font-size: clamp(10px, 5vw, 50px);
     color: #c9a227;
-    background-color: #1a1a1a;
+    background-color: transparent;
     border: 1px solid #3d3d3d;
-    border-radius: 5px;
+    border-radius: 50%;
     cursor: pointer;
     transition: all 0.2s ease;
 }
