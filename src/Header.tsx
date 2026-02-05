@@ -1,5 +1,4 @@
 import type { GameState } from "./tic-tac-toe"
-import { getWinner } from "./tic-tac-toe"
 import type { JSX } from "react"
 
 export const Header = (
@@ -8,9 +7,9 @@ export const Header = (
         reset: () => void
     }
 ): JSX.Element => {
-    if (getWinner(gameState) !== null) return (
+    if ((gameState.endState !== null) && gameState.endState !== "tie") return (
         <div className="header">
-            <p>{getWinner(gameState)} wins!</p>
+            <p>{gameState.endState === "X" ? "RED" : "BLUE"} wins!</p>
             <button className="reset-btn" onClick={reset}>
                 Play again?
             </button>
@@ -26,7 +25,7 @@ export const Header = (
     )
     else return (
         <div className="header">
-            <p>{gameState.currentPlayer}'s move</p>
+            <p>{gameState.currentPlayer === "X" ? "RED" : "BLUE"}'s move</p>
         </div>
     )
 }
