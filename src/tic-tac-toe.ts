@@ -12,21 +12,10 @@ export type Board = [
 type WinState = Player | 'tie' | null
 
 export type GameState = {
-  board: Board;
-  currentPlayer: Player;
+  board: Board
+  currentPlayer: Player
   endState: WinState
-};
-
-export function createGame(): GameState {
-  return {
-    board: [
-      null, null, null, null, null, null, null, null, null,
-      null, null, null, null, null, null, null, null, null,
-      null, null, null, null, null, null, null, null, null
-    ],
-    currentPlayer: "X",
-    endState: null
-  };
+  id: string
 }
 
 export const changePlayer = (player: Player): Player => {
@@ -51,8 +40,18 @@ export function makeMove(state: GameState, position: number): GameState {
   const newBoard: Board = [...state.board]
   newBoard[position] = state.currentPlayer
   const newPlayer = changePlayer(state.currentPlayer)
-  const winner = getWinner({ board: newBoard, currentPlayer: state.currentPlayer, endState: state.endState })
-  const newState: GameState = { board: newBoard, currentPlayer: newPlayer, endState: winner }
+  const winner = getWinner({
+    board: newBoard,
+    currentPlayer: state.currentPlayer,
+    endState: state.endState,
+    id: state.id
+  })
+  const newState: GameState = {
+    board: newBoard,
+    currentPlayer: newPlayer,
+    endState: winner,
+    id: state.id
+  }
   return newState
 }
 

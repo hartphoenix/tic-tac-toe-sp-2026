@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import type { GameState, Player } from "./tic-tac-toe"
-import { createGame } from "./tic-tac-toe";
+import { createGame } from "../gameStore";
 // import { Board } from "./Board";
 import { Header } from "./Header";
 import { Board3D } from "./Board3D";
