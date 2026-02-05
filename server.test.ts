@@ -3,10 +3,10 @@ import request from 'supertest'
 import app from './server.ts'
 import type { GameState } from './src/tic-tac-toe.ts'
 
-describe('GET /create', () => {
+describe('GET /api/create', () => {
     it('responds with json containing new game', async () => {
         const response = await request(app)
-            .get('/create')
+            .get('/api/create')
             .expect('Content-Type', /json/)
             .expect(200)
         expect(response.body.board).toEqual(Array(27).fill(null))
@@ -17,19 +17,19 @@ describe('GET /create', () => {
     })
 
     it('generates unique IDs for each game', async () => {
-        const game1 = await request(app).get('/create')
-        const game2 = await request(app).get('/create')
+        const game1 = await request(app).get('/api/create')
+        const game2 = await request(app).get('/api/create')
         expect(game1.body.id).not.toEqual(game2.body.id)
     })
 })
 
-describe('GET /list', () => {
+describe('GET /api/list', () => {
     it('returns a JSON array of unique GameState objects', async () => {
-        await request(app).get('/create')
-        await request(app).get('/create')
+        await request(app).get('/api/create')
+        await request(app).get('/api/create')
 
         const response = await request(app)
-            .get('/list')
+            .get('/api/list')
             .expect('Content-Type', /json/)
             .expect(200)
 
@@ -48,11 +48,11 @@ describe('GET /list', () => {
     })
 })
 
-describe('GET /game/:id', () => {
+describe('GET /api/game/:id', () => {
     it('returns a valid JSON GameState object with the specified ID', async () => {
-        const createResponse = await request(app).get('/create')
+        const createResponse = await request(app).get('/api/create')
         const gameResponse = await request(app)
-            .get(`/game/${createResponse.body.id}`)
+            .get(`/api/game/${createResponse.body.id}`)
             .expect('Content-Type', /json/)
             .expect(200)
         expect(gameResponse.body).toEqual(createResponse.body)
@@ -60,18 +60,18 @@ describe('GET /game/:id', () => {
 
     it('responds with 404 to an invalid ID', async () => {
         const response = await request(app)
-            .get('/game/2340dsdfzjascd')
+            .get('/api/game/2340dsdfzjascd')
             .expect(404)
         expect(response.body.error).toEqual('Game ID not found')
     })
 })
 
-describe('POST /move/:id', () => {
+describe('POST /api/move/:id', () => {
     it('updates the gameState correctly and returns it', async () => {
         const createResponse = await request(app)
-            .get('/create')
+            .get('/api/create')
         const moveResponse = await request(app)
-            .post(`/move/${createResponse.body.id}`)
+            .post(`/api/move/${createResponse.body.id}`)
             .send({ player: "X", position: 20 })
             .expect('Content-Type', /json/)
             .expect(200)
@@ -82,100 +82,99 @@ describe('POST /move/:id', () => {
     })
 
     it('updates only the game with the specified ID', async () => {
-        const game1 = await request(app).get('/create')
-        const game2 = await request(app).get('/create')
+        const game1 = await request(app).get('/api/create')
+        const game2 = await request(app).get('/api/create')
 
         await request(app)
-            .post(`/move/${game1.body.id}`)
-            .send({ player: "X", position: 0 })
+            .post(`/api/move/${game1.body.id}`)
+            .send({ player: "X", position: 5 })
             .expect(200)
 
-        const listResponse = await request(app).get('/list')
+        const listResponse = await request(app).get('/api/list')
         const updatedGame1 = listResponse.body.find((g: GameState) => g.id === game1.body.id)
         const updatedGame2 = listResponse.body.find((g: GameState) => g.id === game2.body.id)
-
-        expect(updatedGame1.board[0]).toEqual("X")
+        expect(updatedGame1.board[5]).toEqual("X")
         expect(updatedGame2.board).toEqual(Array(27).fill(null))
     })
 
     it('responds with 400 if position already taken', async () => {
         const createResponse = await request(app)
-            .get('/create')
+            .get('/api/create')
         await request(app)
-            .post(`/move/${createResponse.body.id}`)
-            .send({ player: "X", position: 0 })
+            .post(`/api/move/${createResponse.body.id}`)
+            .send({ player: "X", position: 5 })
         const response = await request(app)
-            .post(`/move/${createResponse.body.id}`)
-            .send({ player: "O", position: 0 })
+            .post(`/api/move/${createResponse.body.id}`)
+            .send({ player: "O", position: 5 })
             .expect(400)
         expect(response.body.error).toEqual("Position is already occupied")
     })
 
     it('responds with 404 to an invalid ID', async () => {
         const response = await request(app)
-            .post('/move/23qwfdvxiddf')
-            .send({ player: "X", position: 0 })
+            .post('/api/move/23qwfdvxiddf')
+            .send({ player: "X", position: 5 })
             .expect(404)
         expect(response.body.error).toEqual('Game ID not found')
     })
 
     it('responds with 400 if wrong player turn', async () => {
-        const createResponse = await request(app).get('/create')
+        const createResponse = await request(app).get('/api/create')
         const response = await request(app)
-            .post(`/move/${createResponse.body.id}`)
-            .send({ player: "O", position: 0 })
+            .post(`/api/move/${createResponse.body.id}`)
+            .send({ player: "O", position: 5 })
             .expect(400)
         expect(response.body.error).toEqual("It's X's turn")
     })
 
     it('responds with 400 if position out of range', async () => {
-        const createResponse = await request(app).get('/create')
+        const createResponse = await request(app).get('/api/create')
         const response = await request(app)
-            .post(`/move/${createResponse.body.id}`)
+            .post(`/api/move/${createResponse.body.id}`)
             .send({ player: "X", position: 27 })
             .expect(400)
         expect(response.body.error).toEqual("Position must be between 0 and 26")
     })
 
     it('responds with 400 if position is negative', async () => {
-        const createResponse = await request(app).get('/create')
+        const createResponse = await request(app).get('/api/create')
         const response = await request(app)
-            .post(`/move/${createResponse.body.id}`)
+            .post(`/api/move/${createResponse.body.id}`)
             .send({ player: "X", position: -1 })
             .expect(400)
         expect(response.body.error).toEqual("Position must be between 0 and 26")
     })
 
     it('responds with 400 if game already over', async () => {
-        const createResponse = await request(app).get('/create')
+        const createResponse = await request(app).get('/api/create')
         const id = createResponse.body.id
-        // Play a winning line for X: positions 0, 1, 2 (top row of first layer)
-        await request(app).post(`/move/${id}`).send({ player: "X", position: 0 })
-        await request(app).post(`/move/${id}`).send({ player: "O", position: 9 })
-        await request(app).post(`/move/${id}`).send({ player: "X", position: 1 })
-        await request(app).post(`/move/${id}`).send({ player: "O", position: 10 })
-        await request(app).post(`/move/${id}`).send({ player: "X", position: 2 }) // X wins
+        // Play a winning line for X: positions 3, 4, 5 (middle row of first layer)
+        await request(app).post(`/api/move/${id}`).send({ player: "X", position: 3 })
+        await request(app).post(`/api/move/${id}`).send({ player: "O", position: 9 })
+        await request(app).post(`/api/move/${id}`).send({ player: "X", position: 4 })
+        await request(app).post(`/api/move/${id}`).send({ player: "O", position: 10 })
+        await request(app).post(`/api/move/${id}`).send({ player: "X", position: 5 }) // X wins
 
         const response = await request(app)
-            .post(`/move/${id}`)
+            .post(`/api/move/${id}`)
             .send({ player: "O", position: 11 })
             .expect(400)
         expect(response.body.error).toEqual("Game is already over")
     })
 
     it('responds with 400 if player field missing', async () => {
-        const createResponse = await request(app).get('/create')
+        const createResponse = await request(app).get('/api/create')
         const response = await request(app)
-            .post(`/move/${createResponse.body.id}`)
+            .post(`/api/move/${createResponse.body.id}`)
             .send({ position: 0 })
             .expect(400)
         expect(response.body.error).toEqual("Player field missing")
     })
 
     it('responds with 400 if position field missing', async () => {
-        const createResponse = await request(app).get('/create')
+        const createResponse = await request(app).get('/api/create')
         const response = await request(app)
-            .post(`/move/${createResponse.body.id}`)
+            .post(`/api/move/${createResponse.body.id}`)
             .send({ player: "X" })
             .expect(400)
         expect(response.body.error).toEqual("Position field missing")
