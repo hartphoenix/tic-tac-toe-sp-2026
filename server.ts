@@ -3,12 +3,24 @@ import express from 'express';
 import ViteExpress from 'vite-express';
 import { createGame, makeMove, games } from './gameStore'
 import type { Player } from './src/tic-tac-toe'
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app: Express = express();
 app.use(express.json());
 
-// Configure vite-express to not intercept API routes
-ViteExpress.config({ ignorePaths: /^\/api/ });
+const isProduction = process.env.NODE_ENV === 'production';
+
+// In production, serve static files from dist
+if (isProduction) {
+    app.use(express.static(path.join(__dirname, 'dist')));
+} else {
+    // Configure vite-express to not intercept API routes in development
+    ViteExpress.config({ ignorePaths: /^\/api/ });
+}
 
 app.get('/api/create', (req: Request, res: Response): void => {
     const newGame = createGame()
@@ -60,5 +72,26 @@ app.post('/api/move/:id', (req: Request<{ id: string }>, res: Response): void =>
     }
 })
 
-ViteExpress.listen(app, 3000, () => console.log('Server is listening...'))
+// In production, serve index.html for all non-API routes (SPA fallback)
+if (isProduction) {
+    app.use((req: Request, res: Response) => {
+        // Only serve index.html for GET requests that aren't API routes
+        if (req.method === 'GET' && !req.path.startsWith('/api')) {
+            res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+        }
+    });
+}
+
+const port = process.env.PORT || 3000;
+
+if (isProduction) {
+    app.listen(port, () => {
+        console.log(`Production server listening on port ${port}`);
+    });
+} else {
+    ViteExpress.listen(app, port as number, () => {
+        console.log(`Development server listening on port ${port}`);
+    });
+}
+
 export default app
