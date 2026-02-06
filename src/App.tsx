@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, type Ref } from "react";
 import type { GameState, Player } from "./tic-tac-toe"
 import { Header } from "./Header";
 import { Board3D } from "./Board3D";
@@ -21,12 +21,42 @@ function App() {
   const [gameState, setGameState] = useState<GameState>(nullGame)
   const [view, setView] = useState<View>("lobby")
   const [gameList, setGameList] = useState<GameState[]>([])
+  const socket: Ref<WebSocket | null> = useRef(null)
 
   const createGame = async (): Promise<void> => {
     const response = await fetch('/api/create')
     const newGame = await response.json()
     setGameState(newGame)
   }
+
+  useEffect(() => {
+    // if (socket.current === null) {
+    const ws = new WebSocket('ws://localhost:3000/ws')
+    socket.current = ws
+
+    ws.onopen = () => {
+      console.log('[open] connection established')
+      ws.send('message from the client')
+    }
+
+    ws.onmessage = (event) => {
+      console.log('message received:', event.data)
+    }
+
+    ws.onclose = function (event) {
+      if (event.wasClean) {
+        console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+      } else {
+        // e.g. server process killed or network down
+        console.log('[close] Connection died');
+      }
+    }
+    // Cleanup on unmount
+    // return () => {
+    //   ws.close();
+    // };
+    //}
+  }, [])
 
   useEffect(() => {
     const fetchList = async () => {
