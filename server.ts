@@ -5,19 +5,15 @@ import expressWs from 'express-ws';
 import { createGame, makeMove, games } from './gameStore'
 import type { Player } from './src/tic-tac-toe'
 import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const { app, getWss } = expressWs(express());
 app.use(express.json());
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-// In production, serve static files from dist
+// In production, serve static files from dist (use process.cwd() for project root)
 if (isProduction) {
-    app.use(express.static(path.join(__dirname, 'dist')));
+    app.use(express.static(path.join(process.cwd(), 'dist')));
 } else {
     // Configure vite-express to not intercept API or WebSocket routes in development
     ViteExpress.config({ ignorePaths: /^\/api|^\/ws/ });
@@ -97,7 +93,7 @@ if (isProduction) {
     app.use((req: Request, res: Response) => {
         // Only serve index.html for GET requests that aren't API or WebSocket routes
         if (req.method === 'GET' && !req.path.startsWith('/api') && !req.path.startsWith('/ws')) {
-            res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+            res.sendFile(path.join(process.cwd(), 'dist', 'index.html'));
         }
     });
 }
