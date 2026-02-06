@@ -5,6 +5,7 @@ import expressWs from 'express-ws';
 import { createGame, makeMove, games } from './gameStore'
 import type { Player } from './src/tic-tac-toe'
 import path from 'path';
+import fs from 'fs';
 
 const { app, getWss } = expressWs(express());
 app.use(express.json());
@@ -13,7 +14,19 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 // In production, serve static files from dist (use process.cwd() for project root)
 if (isProduction) {
-    app.use(express.static(path.join(process.cwd(), 'dist')));
+    const cwd = process.cwd();
+    const distPath = path.join(cwd, 'dist');
+
+    // Debug logging for Render
+    console.log('[DEBUG] process.cwd():', cwd);
+    console.log('[DEBUG] distPath:', distPath);
+    console.log('[DEBUG] dist exists?', fs.existsSync(distPath));
+    if (fs.existsSync(distPath)) {
+        console.log('[DEBUG] dist contents:', fs.readdirSync(distPath));
+    }
+    console.log('[DEBUG] cwd contents:', fs.readdirSync(cwd).filter(f => !f.startsWith('.')));
+
+    app.use(express.static(distPath));
 } else {
     // Configure vite-express to not intercept API or WebSocket routes in development
     ViteExpress.config({ ignorePaths: /^\/api|^\/ws/ });
