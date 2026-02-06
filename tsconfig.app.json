@@ -29,7 +29,6 @@
     "noUncheckedSideEffectImports": true
   },
   "include": [
-    "src",
-    "deprecated/tic-tac-test.ts"
+    "src"
   ]
 }
