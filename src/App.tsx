@@ -31,7 +31,7 @@ function App() {
 
   useEffect(() => {
     // if (socket.current === null) {
-    const ws = new WebSocket('ws://localhost:3000/ws')
+    const ws = new WebSocket('/ws')
     socket.current = ws
 
     ws.onopen = () => {
