@@ -100,6 +100,10 @@ app.ws('/ws', (ws, _req) => {
     }
   })
 
+  // ws.on('open', () => {
+  //   console.log('[server] client connected')
+  // })
+
   ws.on('close', () => {
     console.log('[server] client disconnected')
   })

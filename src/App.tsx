@@ -29,7 +29,9 @@ function App() {
   }
 
   useEffect(() => {
-    // if (socket.current === null) {
+    // if there is an active socket, we don't need to do anything.
+    if (socket.current) return
+
     const ws = new WebSocket('/ws')
     socket.current = ws
 
@@ -39,6 +41,7 @@ function App() {
     }
 
     ws.onmessage = (event): void => {
+      console.log("received message")
       const data = JSON.parse(event.data)
       if (data.type === 'game-update') {
         setGameState(data.gameState)
@@ -53,11 +56,12 @@ function App() {
         console.log('[close] Connection died');
       }
     }
+
     // Cleanup on unmount
-    // return () => {
-    //   ws.close();
-    // };
-    //}
+    return () => {
+      ws.close()
+      socket.current = null
+    };
   }, [])
 
   useEffect(() => {
