@@ -44,7 +44,7 @@ export const LobbyView = (props: LobbyProps) => {
   return (
     <div className="lobby">
       <div className="lobby-title">
-        <h1>TRICK-TAC-TOE</h1>
+        <h1>Triple-Tac-Toe</h1>
       </div>
       <div className="lobby-content">
         <button className="newgame-btn" onClick={startGame}>New Game</button>
