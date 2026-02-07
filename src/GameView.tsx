@@ -49,6 +49,7 @@ export const GameView = ({
       <Board3D
         board={gameState.board}
         onCellClick={handleCellClick}
+        rowsClaimed={gameState.rowsClaimed}
       />
       <div className="scoreboard">
         <h2 className="red-score">

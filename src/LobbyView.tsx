@@ -1,6 +1,7 @@
 import type { GameState } from './tic-tac-toe'
 import type { JSX } from 'react'
 import type { View } from './App'
+import { getRows } from '../gameStore'
 
 type LobbyProps = {
   createGame: () => void
@@ -21,7 +22,9 @@ export const LobbyView = (props: LobbyProps) => {
       console.error("Game ID reference invalid")
       return
     }
-    props.setGameState(game)
+    const loadedGame = { ...game, rowsClaimed: getRows(game.board) }
+    console.log("rebuilt map:", loadedGame.rowsClaimed)
+    props.setGameState(loadedGame)
     props.setView("game")
   }
   const listElements: JSX.Element[] = props.gameList
