@@ -24,10 +24,11 @@ type CellProps = {
   position: [number, number, number]
   value: Cell
   onClick: () => void
+  claimedBy?: Player
 }
 
 // Individual cell in the 3D grid
-function Cell3D({ position, value, onClick }: CellProps) {
+function Cell3D({ position, value, onClick, claimedBy }: CellProps) {
   const [hovered, setHovered] = useState(false)
   const pointerStart = useRef<{ x: number; y: number } | null>(null)
 
@@ -38,10 +39,18 @@ function Cell3D({ position, value, onClick }: CellProps) {
     return hovered ? COLORS.emptyHover : COLORS.empty
   }
 
-  // Animate color and opacity changes over 300ms
+  // Determine emissive (glow) color based on who claimed the row
+  const getEmissive = () => {
+    if (claimedBy === "X") return COLORS.X
+    if (claimedBy === "O") return COLORS.O
+    return "#000000"
+  }
+
+  // Animate color, opacity, and emissive changes over 300ms
   const springs = useSpring({
     color: getColor(),
     opacity: value ? 0.85 : hovered ? 0.6 : 0.2,
+    emissiveIntensity: claimedBy ? 0.4 : 0,
     config: { duration: 300 }
   })
 
@@ -78,6 +87,8 @@ function Cell3D({ position, value, onClick }: CellProps) {
           color={springs.color}
           transparent
           opacity={springs.opacity}
+          emissive={getEmissive()}
+          emissiveIntensity={springs.emissiveIntensity}
         />
       </mesh>
     </group>
@@ -110,6 +121,15 @@ type Board3DProps = {
 export function Board3D({ board, onCellClick, rowsClaimed }: Board3DProps) {
   // Default empty 27-cell board for demo
   const cells = board ?? Array(27).fill(null)
+
+  // Build index→player lookup for claimed cells (for glow effect)
+  const claimedByIndex = new Map<number, Player>()
+  for (const [key, player] of rowsClaimed) {
+    const indices: number[] = JSON.parse(key)
+    for (const idx of indices) {
+      claimedByIndex.set(idx, player)
+    }
+  }
 
   // Spread controls spacing between cells (pinch to collapse, unpinch to spread)
   const [spread, setSpread] = useState(1.0)
@@ -206,6 +226,7 @@ export function Board3D({ board, onCellClick, rowsClaimed }: Board3DProps) {
             position={indexToPosition(index)}
             value={value}
             onClick={() => onCellClick?.(index)}
+            claimedBy={claimedByIndex.get(index)}
           />
         ))}
 

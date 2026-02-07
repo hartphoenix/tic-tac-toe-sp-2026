@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, type Ref } from "react";
 import type { GameState } from "./tic-tac-toe"
 import { GameView } from "./GameView";
 import { LobbyView } from "./LobbyView";
+import { getRows } from '../gameStore'
 
 export type View = "lobby" | "game"
 
@@ -35,7 +36,8 @@ function App() {
 
   const createGame = async (): Promise<void> => {
     const response = await fetch('/api/create')
-    const newGame = await response.json()
+    const jsonGame = await response.json()
+    const newGame = { ...jsonGame, rowsClaimed: getRows(jsonGame.board) }
     setGameState(newGame)
   }
 
@@ -55,7 +57,11 @@ function App() {
       console.log("received message")
       const data = JSON.parse(event.data)
       if (data.type === 'game-update') {
-        setGameState(data.gameState)
+        const newGameState = {
+          ...data.gameState,
+          rowsClaimed: getRows(data.gameState.board)
+        }
+        setGameState(newGameState)
       }
     }
 
