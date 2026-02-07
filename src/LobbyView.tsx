@@ -28,24 +28,21 @@ export const LobbyView = (props: LobbyProps) => {
     .filter(game => game.endState === null)
     .map((game, index) => {
       return (
-        <li key={game.id}>
-          <button
-            className="game-btn"
-            key={game.id}
-            onClick={() => loadGame(game.id)}>
-            Game {index + 1}:
-          </button>
-        </li>
+        <button
+          className="game-btn"
+          key={game.id}
+          onClick={() => loadGame(game.id)}>
+          Game {index + 1}:
+        </button>
       )
     })
 
   return (
-    <>
-      <p>Lobby View</p>
+    <div className="lobby">
+      <p>Welcome to</p>
+      <h1>Tic-Tac-Toe</h1>
       <button className="newgame-btn" onClick={startGame}>New Game</button>
-      <ul>
-        {listElements}
-      </ul>
-    </>
+      {listElements}
+    </div>
   )
 }
