@@ -26,23 +26,31 @@ export const LobbyView = (props: LobbyProps) => {
   }
   const listElements: JSX.Element[] = props.gameList
     .filter(game => game.endState === null)
-    .map((game, index) => {
+    .map((game) => {
+      const turns = game.board.filter((cell) => cell !== null).length
+      const player = game.currentPlayer === "X" ? "Red" : "Blue"
+      const dotColor = game.currentPlayer === "X" ? "red" : "blue"
       return (
         <button
           className="game-btn"
           key={game.id}
           onClick={() => loadGame(game.id)}>
-          Game {index + 1}:
+          <span className={`turn-dot ${dotColor}`} />
+          {turns} Move{turns !== 1 ? "s" : ""} | {player}'s Turn
         </button>
       )
     })
 
   return (
     <div className="lobby">
-      <p>Welcome to</p>
-      <h1>Tic-Tac-Toe</h1>
-      <button className="newgame-btn" onClick={startGame}>New Game</button>
-      {listElements}
+      <div className="lobby-title">
+        <h1>TRICK-TAC-TOE</h1>
+      </div>
+      <div className="lobby-content">
+        <button className="newgame-btn" onClick={startGame}>New Game</button>
+        {listElements}
+      </div>
+      <div className="footer lobby-content"><p>[Pinch/Scroll to Expand & Contract the Cube]</p></div>
     </div>
   )
 }

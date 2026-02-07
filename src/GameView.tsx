@@ -38,7 +38,7 @@ export const GameView = ({
   }
 
   return (
-    <>
+    <div className="game-view">
       <button
         className="lobby-btn"
         onClick={() => setView("lobby")}
@@ -50,6 +50,6 @@ export const GameView = ({
         board={gameState.board}
         onCellClick={handleCellClick}
       />
-    </>
+    </div>
   )
 }

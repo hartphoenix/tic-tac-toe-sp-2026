@@ -18,9 +18,18 @@ const nullGame: GameState = {
 
 function App() {
   const [view, setView] = useState<View>("lobby")
+  const [transitioning, setTransitioning] = useState(false)
   const [gameList, setGameList] = useState<GameState[]>([])
   const [gameState, setGameState] = useState<GameState>(nullGame)
   const socket: Ref<WebSocket | null> = useRef(null)
+
+  const changeView = (newView: View) => {
+    setTransitioning(true)
+    setTimeout(() => {
+      setView(newView)
+      setTransitioning(false)
+    }, 300)
+  }
 
   const createGame = async (): Promise<void> => {
     const response = await fetch('/api/create')
@@ -73,26 +82,26 @@ function App() {
     fetchList()
   }, [view])
 
-  if (view === "game") {
-    return (
-      <GameView
-        setView={setView}
-        gameState={gameState}
-        createGame={createGame}
-        socket={socket}
-      />
-    )
-  } else if (view === "lobby") {
-    return (
-      <LobbyView
-        createGame={createGame}
-        gameList={gameList}
-        setGameList={setGameList}
-        setGameState={setGameState}
-        setView={setView}
-      />
-    )
-  }
+  return (
+    <div className={`view-container ${transitioning ? 'fade-out' : ''}`}>
+      {view === "game" ? (
+        <GameView
+          setView={changeView}
+          gameState={gameState}
+          createGame={createGame}
+          socket={socket}
+        />
+      ) : (
+        <LobbyView
+          createGame={createGame}
+          gameList={gameList}
+          setGameList={setGameList}
+          setGameState={setGameState}
+          setView={changeView}
+        />
+      )}
+    </div>
+  )
 }
 
 export default App;
