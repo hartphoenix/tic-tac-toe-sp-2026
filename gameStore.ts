@@ -1,5 +1,5 @@
 import type { GameState, Board, Player } from './src/tic-tac-toe'
-import { getWinner } from './src/tic-tac-toe'
+import { getScore, getWinner } from './src/tic-tac-toe'
 
 export const games: Map<string, GameState> = new Map()
 
@@ -10,6 +10,7 @@ export function createGame(): GameState {
       null, null, null, null, null, null, null, null, null,
       null, null, null, null, null, null, null, null, null
     ],
+    score: { X: 0, O: 0 },
     currentPlayer: "X",
     endState: null,
     id: crypto.randomUUID()
@@ -40,14 +41,11 @@ export function makeMove(state: GameState, position: number): GameState {
   const newBoard: Board = [...state.board]
   newBoard[position] = state.currentPlayer
   const newPlayer = changePlayer(state.currentPlayer)
-  const winner = getWinner({
-    board: newBoard,
-    currentPlayer: state.currentPlayer,
-    endState: state.endState,
-    id: state.id
-  })
+  const newScore = getScore(newBoard)
+  const winner = getWinner(newScore)
   const newState: GameState = {
     board: newBoard,
+    score: newScore,
     currentPlayer: newPlayer,
     endState: winner,
     id: state.id

@@ -11,6 +11,7 @@ const nullGame: GameState = {
     null, null, null, null, null, null, null, null, null,
     null, null, null, null, null, null, null, null, null
   ],
+  score: { X: 0, O: 0 },
   currentPlayer: "X",
   endState: null,
   id: "nullGame"

@@ -14,19 +14,27 @@ type WinState = Player | 'tie' | null
 export type GameState = {
   board: Board
   currentPlayer: Player
+  score: { X: number, O: number }
   endState: WinState
   id: string
 }
 
-const tripleWins = (state: GameState, n: number[]): boolean => {
-  if (state.board[n[0]] && state.board[n[0]] === state.board[n[1]] && state.board[n[1]] === state.board[n[2]]) {
-    return true
-  } else return false
+export const getScore = (board: Board): { X: number, O: number } => {
+  let xScore = 0
+  let oScore = 0
+  for (const line of winLines) {
+    if (board[line[0]] // all positions are occupied by the same player
+      && board[line[0]] === board[line[1]]
+      && board[line[1]] === board[line[2]]) {
+      if (board[line[0]] === "X") { xScore++ } else { oScore++ }
+    }
+  }
+  console.log("score returned:", { X: xScore, O: oScore })
+  return { X: xScore, O: oScore }
 }
 
-export function getWinner(state: GameState): Player | null {
-  for (const line of winLines) {
-    if (tripleWins(state, line)) return state.board[line[0]]
-  }
+export const getWinner = (score: { X: number, O: number }): Player | null => {
+  if (score.X === 3) { return "X" }
+  if (score.O === 3) { return "O" }
   return null;
 }

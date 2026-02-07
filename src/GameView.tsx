@@ -50,6 +50,14 @@ export const GameView = ({
         board={gameState.board}
         onCellClick={handleCellClick}
       />
+      <div className="scoreboard">
+        <h2 className="red-score">
+          <span className="red-text">RED:</span> {gameState.score.X}
+        </h2>
+        <h2 className="blue-score">
+          <span className="blue-text">BLUE:</span> {gameState.score.O}
+        </h2>
+      </div>
     </div>
   )
 }
