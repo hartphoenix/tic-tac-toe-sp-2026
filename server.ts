@@ -89,6 +89,7 @@ app.ws('/ws', (ws, _req) => {
 
     switch (data.type) {
       case 'move':
+        console.log(data.gameState)
         handleMove(ws, broadcast, data)
         break
       // case 'join-game':

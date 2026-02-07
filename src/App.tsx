@@ -12,6 +12,7 @@ const nullGame: GameState = {
     null, null, null, null, null, null, null, null, null
   ],
   score: { X: 0, O: 0 },
+  rowsClaimed: new Map(),
   currentPlayer: "X",
   endState: null,
   id: "nullGame"
