@@ -175,7 +175,7 @@ body::before {
   font-family: "Audiowide", sans-serif;
   font-weight: 400;
   font-style: normal;
-  font-size: clamp(14px, 2.5vw, 28px);
+  font-size: clamp(14px, 2.5vw, 18px);
   letter-spacing: clamp(1px, 0.3vw, 3px);
   text-transform: uppercase;
   white-space: nowrap;
@@ -205,7 +205,7 @@ body::before {
   font-family: "Audiowide", sans-serif;
   font-weight: 400;
   font-style: normal;
-  font-size: clamp(14px, 2.5vw, 28px);
+  font-size: clamp(14px, 2.5vw, 18px);
   letter-spacing: clamp(1px, 0.3vw, 3px);
   text-transform: uppercase;
   white-space: nowrap;
@@ -329,7 +329,7 @@ h1 {
   font-family: "Audiowide", sans-serif;
   font-weight: 200;
   font-style: normal;
-  font-size: clamp(14px, 4vw, 32px);
+  font-size: clamp(14px, 4vw, 20px);
   color: #c9a227;
   background-color: transparent;
   border: 1px solid #c9a227;
