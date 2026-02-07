@@ -10,7 +10,7 @@ type LobbyProps = {
   setView: (view: View) => void
 }
 
-export const Lobby = (props: LobbyProps) => {
+export const LobbyView = (props: LobbyProps) => {
   const startGame = () => {
     props.createGame()
     props.setView("game")

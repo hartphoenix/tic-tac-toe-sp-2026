@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef, type Ref } from "react";
-import type { GameState, Player } from "./tic-tac-toe"
-import { Header } from "./Header";
-import { Board3D } from "./Board3D";
-import { Lobby } from "./Lobby";
+import type { GameState } from "./tic-tac-toe"
+import { GameView } from "./GameView";
+import { LobbyView } from "./LobbyView";
 
 export type View = "lobby" | "game"
 
@@ -18,9 +17,9 @@ const nullGame: GameState = {
 }
 
 function App() {
-  const [gameState, setGameState] = useState<GameState>(nullGame)
   const [view, setView] = useState<View>("lobby")
   const [gameList, setGameList] = useState<GameState[]>([])
+  const [gameState, setGameState] = useState<GameState>(nullGame)
   const socket: Ref<WebSocket | null> = useRef(null)
 
   const createGame = async (): Promise<void> => {
@@ -34,16 +33,19 @@ function App() {
     const ws = new WebSocket('/ws')
     socket.current = ws
 
-    ws.onopen = () => {
+    ws.onopen = (): void => {
       console.log('[open] connection established')
-      ws.send('message from the client')
+      //ws.send(('message from the client'))
     }
 
-    ws.onmessage = (event) => {
-      console.log('message received:', event.data)
+    ws.onmessage = (event): void => {
+      const data = JSON.parse(event.data)
+      if (data.type === 'game-update') {
+        setGameState(data.gameState)
+      }
     }
 
-    ws.onclose = function (event) {
+    ws.onclose = (event): void => {
       if (event.wasClean) {
         console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
       } else {
@@ -67,49 +69,18 @@ function App() {
     fetchList()
   }, [view])
 
-  const sendMove = async (move: { player: Player, position: number }): Promise<GameState> => {
-    const response = await fetch(`/api/move/${gameState.id}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(move)
-    })
-    const updatedState = await response.json()
-    return updatedState
-  }
-
-  const handleCellClick = async (index: number) => {
-    // Ignore clicks on occupied cells or if game is over
-    if (gameState.board[index] !== null
-      || gameState.endState !== null)
-      return
-    try {
-      const newState = await sendMove({ player: gameState.currentPlayer, position: index })
-      setGameState(newState)
-    } catch (err) {
-      console.error('Move failed:', err)
-    }
-  }
-
   if (view === "game") {
     return (
-      <>
-        <button
-          className="lobby-btn"
-          onClick={() => setView("lobby")}
-        >←</button>
-        <Header
-          gameState={gameState}
-          reset={createGame} />
-        <Board3D
-          board={gameState.board}
-          onCellClick={handleCellClick}
-        />
-      </>
-
+      <GameView
+        setView={setView}
+        gameState={gameState}
+        createGame={createGame}
+        socket={socket}
+      />
     )
   } else if (view === "lobby") {
     return (
-      <Lobby
+      <LobbyView
         createGame={createGame}
         gameList={gameList}
         setGameList={setGameList}
