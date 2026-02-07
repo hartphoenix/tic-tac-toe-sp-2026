@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react"
 import { Canvas, useThree } from "@react-three/fiber"
 import { OrbitControls } from "@react-three/drei"
 import { useSpring, animated } from "@react-spring/three"
+import type { Player } from "./tic-tac-toe"
 import type { PerspectiveCamera } from "three"
 import type { Cell } from "./tic-tac-toe"
 
@@ -103,9 +104,10 @@ function CameraController() {
 type Board3DProps = {
   board?: Cell[]
   onCellClick?: (index: number) => void
+  rowsClaimed: Map<string, Player>
 }
 
-export function Board3D({ board, onCellClick }: Board3DProps) {
+export function Board3D({ board, onCellClick, rowsClaimed }: Board3DProps) {
   // Default empty 27-cell board for demo
   const cells = board ?? Array(27).fill(null)
 
