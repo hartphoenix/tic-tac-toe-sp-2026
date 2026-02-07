@@ -113,22 +113,67 @@ export function Board3D({ board, onCellClick }: Board3DProps) {
   const [spread, setSpread] = useState(1.0)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // Attach wheel listener with { passive: false } to allow preventDefault
+  // Track initial pinch distance for mobile touch gestures
+  const initialPinchDistance = useRef<number | null>(null)
+  const initialSpread = useRef<number>(1.0)
+
+  // Attach wheel + touch listeners with { passive: false } to allow preventDefault
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
 
+    // Desktop: wheel/trackpad
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault()
-      // deltaY > 0 means pinch/scroll down = collapse
-      // deltaY < 0 means unpinch/scroll up = spread
-      const delta = e.deltaY * 0.002
+      // deltaY > 0 means pinch in / scroll down = collapse (decrease spread)
+      // deltaY < 0 means pinch out / scroll up = spread (increase spread)
+      const delta = e.deltaY * -0.002
       setSpread(prev => Math.max(MIN_SPREAD, Math.min(MAX_SPREAD, prev + delta)))
     }
 
+    // Mobile: calculate distance between two touch points
+    const getTouchDistance = (touches: TouchList): number => {
+      const dx = touches[0].clientX - touches[1].clientX
+      const dy = touches[0].clientY - touches[1].clientY
+      return Math.sqrt(dx * dx + dy * dy)
+    }
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        e.preventDefault()
+        initialPinchDistance.current = getTouchDistance(e.touches)
+        initialSpread.current = spread
+      }
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2 && initialPinchDistance.current !== null) {
+        e.preventDefault()
+        const currentDistance = getTouchDistance(e.touches)
+        // Ratio of current pinch to initial pinch
+        const scale = currentDistance / initialPinchDistance.current
+        // Apply scale to initial spread value
+        const newSpread = initialSpread.current * scale
+        setSpread(Math.max(MIN_SPREAD, Math.min(MAX_SPREAD, newSpread)))
+      }
+    }
+
+    const handleTouchEnd = () => {
+      initialPinchDistance.current = null
+    }
+
     container.addEventListener("wheel", handleWheel, { passive: false })
-    return () => container.removeEventListener("wheel", handleWheel)
-  }, [])
+    container.addEventListener("touchstart", handleTouchStart, { passive: false })
+    container.addEventListener("touchmove", handleTouchMove, { passive: false })
+    container.addEventListener("touchend", handleTouchEnd)
+
+    return () => {
+      container.removeEventListener("wheel", handleWheel)
+      container.removeEventListener("touchstart", handleTouchStart)
+      container.removeEventListener("touchmove", handleTouchMove)
+      container.removeEventListener("touchend", handleTouchEnd)
+    }
+  }, [spread])
 
   // Convert flat index to 3D coordinates with spread applied
   // Index mapping: index = x + y*3 + z*9
