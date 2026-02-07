@@ -28,15 +28,16 @@ export const LobbyView = (props: LobbyProps) => {
     .filter(game => game.endState === null)
     .map((game) => {
       const turns = game.board.filter((cell) => cell !== null).length
-      const player = game.currentPlayer === "X" ? "Red" : "Blue"
-      const dotColor = game.currentPlayer === "X" ? "red" : "blue"
+      const player = game.currentPlayer === "X" ? "red" : "blue"
       return (
         <button
           className="game-btn"
           key={game.id}
           onClick={() => loadGame(game.id)}>
-          <span className={`turn-dot ${dotColor}`} />
-          {turns} Move{turns !== 1 ? "s" : ""} | {player}'s Turn
+          <span className={`${player}-text`}>{player}'s</span> Turn
+          ⏤ {turns} Move{turns !== 1 ? "s" : ""} ⏤
+          <span className="red-text">{game.score.X}</span> :
+          <span className="blue-text">{game.score.O}</span>
         </button>
       )
     })
