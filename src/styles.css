@@ -168,14 +168,14 @@ body::before {
 }
 
 .newgame-btn {
-  width: clamp(200px, 80vw, 400px);
+  width: min(80vw, 500px);
   height: clamp(32px, 5vh, 44px);
   margin: auto;
   margin-bottom: 10px;
   font-family: "Audiowide", sans-serif;
   font-weight: 400;
   font-style: normal;
-  font-size: clamp(14px, 2.5vw, 18px);
+  font-size: min(3.6vw, 18px);
   letter-spacing: clamp(1px, 0.3vw, 3px);
   text-transform: uppercase;
   white-space: nowrap;
@@ -194,7 +194,7 @@ body::before {
 }
 
 .game-btn {
-  width: clamp(200px, 80vw, 400px);
+  width: min(80vw, 500px);
   height: clamp(32px, 5vh, 44px);
   margin: auto;
   margin-bottom: 10px;
@@ -205,7 +205,7 @@ body::before {
   font-family: "Audiowide", sans-serif;
   font-weight: 400;
   font-style: normal;
-  font-size: clamp(14px, 2.5vw, 18px);
+  font-size: min(3.3vw, 18px);
   letter-spacing: clamp(1px, 0.3vw, 3px);
   text-transform: uppercase;
   white-space: nowrap;
@@ -312,6 +312,12 @@ h1 {
 .footer {
   position: relative;
   bottom: 0;
+}
+
+.footer p {
+  font-size: min(3vw, 14px);
+  white-space: nowrap;
+  margin: 0;
 }
 
 .lobby-btn {
