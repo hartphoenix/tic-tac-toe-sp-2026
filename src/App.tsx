@@ -1,26 +1,115 @@
-import { useState } from "react";
-import { createGame, makeMove } from "./tic-tac-toe";
-import { Board } from "./Board";
+import { useState, useEffect, useRef, type Ref } from "react";
+import type { GameState } from "./tic-tac-toe"
+import { GameView } from "./GameView";
+import { LobbyView } from "./LobbyView";
+import { getRows } from '../gameStore'
 
-function App() {
-  const [gameState, setGameState] = useState(getInitialGame())
+export type View = "lobby" | "game"
 
-  // arbitrary change
-  // TODO: display the gameState, and call `makeMove` when a player clicks a button
-  return (
-    <>
-      <div>Hello World! current player: {gameState.currentPlayer}</div>
-      <Board gameState={gameState} setGameState={setGameState} />
-    </>
-
-  )
+const nullGame: GameState = {
+  board: [
+    null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null
+  ],
+  score: { X: 0, O: 0 },
+  rowsClaimed: new Map(),
+  currentPlayer: "X",
+  endState: null,
+  id: "nullGame"
 }
 
-function getInitialGame() {
-  let initialGameState = createGame()
-  initialGameState = makeMove(initialGameState, 3)
-  initialGameState = makeMove(initialGameState, 0)
-  return initialGameState
+function App() {
+  const [view, setView] = useState<View>("lobby")
+  const [transitioning, setTransitioning] = useState(false)
+  const [gameList, setGameList] = useState<GameState[]>([])
+  const [gameState, setGameState] = useState<GameState>(nullGame)
+  const socket: Ref<WebSocket | null> = useRef(null)
+
+  const changeView = (newView: View) => {
+    setTransitioning(true)
+    setTimeout(() => {
+      setView(newView)
+      setTransitioning(false)
+    }, 300)
+  }
+
+  const createGame = async (): Promise<void> => {
+    const response = await fetch('/api/create')
+    const jsonGame = await response.json()
+    const newGame = { ...jsonGame, rowsClaimed: getRows(jsonGame.board) }
+    setGameState(newGame)
+  }
+
+  useEffect(() => {
+    // if there is an active socket, we don't need to do anything.
+    if (socket.current) return
+
+    const ws = new WebSocket('/ws')
+    socket.current = ws
+
+    ws.onopen = (): void => {
+      console.log('[open] connection established')
+      //ws.send(('message from the client'))
+    }
+
+    ws.onmessage = (event): void => {
+      console.log("received message")
+      const data = JSON.parse(event.data)
+      if (data.type === 'game-update') {
+        const newGameState = {
+          ...data.gameState,
+          rowsClaimed: getRows(data.gameState.board)
+        }
+        setGameState(newGameState)
+      }
+    }
+
+    ws.onclose = (event): void => {
+      if (event.wasClean) {
+        console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+      } else {
+        // e.g. server process killed or network down
+        console.log('[close] Connection died');
+      }
+    }
+
+    // Cleanup on unmount
+    return () => {
+      ws.close()
+      socket.current = null
+    };
+  }, [])
+
+  useEffect(() => {
+    const fetchList = async () => {
+      const response = await fetch('/api/list')
+      const newList = await response.json()
+      setGameList(newList)
+    }
+    fetchList()
+  }, [view])
+
+  return (
+    <div className={`view-container ${transitioning ? 'fade-out' : ''}`}>
+      {view === "game" ? (
+        <GameView
+          setView={changeView}
+          gameState={gameState}
+          createGame={createGame}
+          socket={socket}
+        />
+      ) : (
+        <LobbyView
+          createGame={createGame}
+          gameList={gameList}
+          setGameList={setGameList}
+          setGameState={setGameState}
+          setView={changeView}
+        />
+      )}
+    </div>
+  )
 }
 
 export default App;
